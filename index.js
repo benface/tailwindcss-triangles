@@ -1,77 +1,81 @@
 const _ = require('lodash');
 const valueParser = require('postcss-value-parser');
 
-module.exports = ({
-  prefix = 'c-triangle-',
-  defaultOptions = {},
-  triangles = {},
-} = {}) => ({ e, addComponents }) => {
-  const defaultDefaultOptions = {
-    direction: 'right',
-    size: '1em',
-    color: 'currentColor',
-  };
-  let mergedDefaultOptions = _.merge(defaultDefaultOptions, defaultOptions);
-  _.forEach(triangles, function(triangle, triangleName) {
-    let triangleDirection = triangle.direction !== undefined ? triangle.direction : mergedDefaultOptions.direction;
-    let triangleSize = triangle.size !== undefined ? triangle.size : mergedDefaultOptions.size;
-    let parsedTriangleSize = valueParser.unit(triangleSize);
-    let triangleColor = triangle.color !== undefined ? triangle.color : mergedDefaultOptions.color;
-    let triangleStyles = {
-      width: '0',
-      height: '0',
+module.exports = function(options = {}) {
+  return ({ config, e, addComponents }) => {
+    const defaultOptions = {
+      componentPrefix: 'c-',
+      defaultSize: '1em',
+      defaultColor: 'currentColor',
     };
-    if (_.includes(['left', 'right', 'up', 'down'], triangleDirection)) {
-      let triangleHeight = triangle.height !== undefined ? triangle.height : mergedDefaultOptions.height;
-      if (triangleHeight === undefined) {
-        triangleHeight = `${parsedTriangleSize.number / 2}${parsedTriangleSize.unit}`;
+    options = _.merge({}, defaultOptions, options);
+
+    const triangles = config('theme.triangles', {});
+
+    _.forEach(triangles, function(value, modifier) {
+      const triangle = _.defaults({}, value, {
+        size: options.defaultSize,
+        color: options.defaultColor,
+      });
+      triangle.name = `triangle-${modifier}`;
+      triangle.parsedSize = valueParser.unit(triangle.size);
+      triangle.styles = {
+        width: '0',
+        height: '0',
+      };
+
+      if (_.includes(['left', 'right', 'up', 'down'], triangle.direction)) {
+        if (triangle.height === undefined) {
+          triangle.height = `${triangle.parsedSize.number / 2}${triangle.parsedSize.unit}`;
+        }
+        let solidBorderValue = `${triangle.height} solid ${triangle.color}`;
+        let transparentBordersValue = `${triangle.parsedSize.number / 2}${triangle.parsedSize.unit} solid transparent`;
+        switch (triangle.direction) {
+          case 'left': triangle.styles.borderRight = solidBorderValue; break;
+          case 'right': triangle.styles.borderLeft = solidBorderValue; break;
+          case 'up': triangle.styles.borderBottom = solidBorderValue; break;
+          case 'down': triangle.styles.borderTop = solidBorderValue; break;
+        }
+        if (triangle.direction === 'left' || triangle.direction === 'right') {
+          triangle.styles.borderTop = transparentBordersValue;
+          triangle.styles.borderBottom = transparentBordersValue;
+        }
+        if (triangle.direction === 'up' || triangle.direction === 'down') {
+          triangle.styles.borderLeft = transparentBordersValue;
+          triangle.styles.borderRight = transparentBordersValue;
+        }
       }
-      let solidBorderValue = `${triangleHeight} solid ${triangleColor}`;
-      let transparentBordersValue = `${parsedTriangleSize.number / 2}${parsedTriangleSize.unit} solid transparent`;
-      switch (triangleDirection) {
-        case 'left': triangleStyles.borderRight = solidBorderValue; break;
-        case 'right': triangleStyles.borderLeft = solidBorderValue; break;
-        case 'up': triangleStyles.borderBottom = solidBorderValue; break;
-        case 'down': triangleStyles.borderTop = solidBorderValue; break;
+      else {
+        let borderWidth = `${triangle.parsedSize.number / Math.sqrt(2)}${triangle.parsedSize.unit}`;
+        let solidBorderValue = `${borderWidth} solid ${triangle.color}`;
+        let transparentBorderValue = `${borderWidth} solid transparent`;
+        switch (triangle.direction) {
+          case 'left-up':
+          case 'up-left':
+            triangle.styles.borderTop = solidBorderValue;
+            triangle.styles.borderRight = transparentBorderValue;
+            break;
+          case 'left-down':
+          case 'down-left':
+            triangle.styles.borderBottom = solidBorderValue;
+            triangle.styles.borderRight = transparentBorderValue;
+            break;
+          case 'right-up':
+          case 'up-right':
+            triangle.styles.borderTop = solidBorderValue;
+            triangle.styles.borderLeft = transparentBorderValue;
+            break;
+          case 'right-down':
+          case 'down-right':
+            triangle.styles.borderBottom = solidBorderValue;
+            triangle.styles.borderLeft = transparentBorderValue;
+            break;
+        }
       }
-      if (triangleDirection === 'left' || triangleDirection === 'right') {
-        triangleStyles.borderTop = transparentBordersValue;
-        triangleStyles.borderBottom = transparentBordersValue;
-      }
-      if (triangleDirection === 'up' || triangleDirection === 'down') {
-        triangleStyles.borderLeft = transparentBordersValue;
-        triangleStyles.borderRight = transparentBordersValue;
-      }
-    }
-    else {
-      let borderWidth = `${parsedTriangleSize.number / Math.sqrt(2)}${parsedTriangleSize.unit}`;
-      let solidBorderValue = `${borderWidth} solid ${triangleColor}`;
-      let transparentBorderValue = `${borderWidth} solid transparent`;
-      switch (triangleDirection) {
-        case 'left-up':
-        case 'up-left':
-          triangleStyles.borderTop = solidBorderValue;
-          triangleStyles.borderRight = transparentBorderValue;
-          break;
-        case 'left-down':
-        case 'down-left':
-          triangleStyles.borderBottom = solidBorderValue;
-          triangleStyles.borderRight = transparentBorderValue;
-          break;
-        case 'right-up':
-        case 'up-right':
-          triangleStyles.borderTop = solidBorderValue;
-          triangleStyles.borderLeft = transparentBorderValue;
-          break;
-        case 'right-down':
-        case 'down-right':
-          triangleStyles.borderBottom = solidBorderValue;
-          triangleStyles.borderLeft = transparentBorderValue;
-          break;
-      }
-    }
-    addComponents({
-      [`.${e(`${prefix}${triangleName}`)}`]: triangleStyles,
+
+      addComponents({
+        [`.${e(`${options.componentPrefix}${triangle.name}`)}`]: triangle.styles,
+      });
     });
-  });
+  };
 };

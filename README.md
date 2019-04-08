@@ -9,20 +9,23 @@ npm install tailwindcss-triangles
 ## Usage
 
 ```js
-// In your Tailwind CSS config
+// tailwind.config.js
 {
+  theme: {
+    triangles: {
+      'left': {
+        direction: 'left',      // one of 'left', 'right', 'up', 'down', 'left-up', 'left-down', 'right-up', and 'right-down'
+        size: '1em',            // defaults to defaultSize
+        height: '0.5em',        // defaults to half the size; has no effect on the diagonal directions (e.g. 'left-up')
+        color: 'currentColor',  // defaults to defaultColor
+      },
+    },
+  },
   plugins: [
     require('tailwindcss-triangles')({
-      prefix: 'c-triangle-',      // defaults to 'c-triangle-'
-      defaultOptions: {},         // any of the options below that you want to apply to all triangles
-      triangles: {
-        'left': {
-          direction: 'left',      // one of 'left', 'right', 'up', 'down', 'left-up', 'left-down', 'right-up', and 'right-down'
-          size: '1em',            // defaults to '1em'
-          height: '0.5em',        // defaults to half the specified size; has no effect on the diagonal directions (e.g. 'left-up')
-          color: 'currentColor',  // defaults to 'currentColor'
-        }
-      },
+      componentPrefix: 'c-',        // defaults to 'c-'
+      defaultSize: '1em',           // defaults to '1em'
+      defaultColor: 'currentColor', // defaults to 'currentColor'
     }),
   ],
 }

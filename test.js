@@ -2,14 +2,33 @@ const _ = require('lodash');
 const cssMatcher = require('jest-matcher-css');
 const postcss = require('postcss');
 const tailwindcss = require('tailwindcss');
+const defaultConfig = require('tailwindcss/defaultConfig');
 const trianglesPlugin = require('./index.js');
 
-const generatePluginCss = (options = {}) => {
-  return postcss(tailwindcss({
-    plugins: [trianglesPlugin(options)],
-  })).process('@tailwind components;', {
+const generatePluginCss = (config, pluginOptions = {}) => {
+  return postcss(
+    tailwindcss(
+      _.merge({
+        corePlugins: {
+          container: false,
+          ...(function() {
+            let disabledCorePlugins = {};
+            Object.keys(defaultConfig.variants).forEach(corePlugin => {
+              disabledCorePlugins[corePlugin] = false;
+            });
+            return disabledCorePlugins;
+          })(),
+        },
+        plugins: [
+          trianglesPlugin(pluginOptions),
+        ],
+      }, config)
+    )
+  )
+  .process('@tailwind components;', {
     from: undefined,
-  }).then(result => {
+  })
+  .then(result => {
     return result.css;
   });
 };
@@ -24,14 +43,18 @@ test('there is no output by default', () => {
   });
 });
 
-test('triangle options are not required', () => {
+test('only a direction is required to generate a triangle component', () => {
   return generatePluginCss({
-    triangles: {
-      'default': {}
+    theme: {
+      triangles: {
+        'right': {
+          direction: 'right',
+        },
+      },
     },
   }).then(css => {
     expect(css).toMatchCss(`
-      .c-triangle-default {
+      .c-triangle-right {
         width: 0;
         height: 0;
         border-left: .5em solid currentColor;
@@ -42,15 +65,20 @@ test('triangle options are not required', () => {
   });
 });
 
-test('you can customize the prefix', () => {
+test('the component prefix is customizable', () => {
   return generatePluginCss({
-    prefix: 'triangle-',
-    triangles: {
-      'default': {}
+    theme: {
+      triangles: {
+        'right': {
+          direction: 'right',
+        },
+      },
     },
+  }, {
+    componentPrefix: '',
   }).then(css => {
     expect(css).toMatchCss(`
-      .triangle-default {
+      .triangle-right {
         width: 0;
         height: 0;
         border-left: .5em solid currentColor;
@@ -61,14 +89,16 @@ test('you can customize the prefix', () => {
   });
 });
 
-test('you can customize a triangle’s direction, size, height, and color', () => {
+test('directions, sizes, heights, and colors are customizable', () => {
   return generatePluginCss({
-    triangles: {
-      'down': {
-        direction: 'down',
-        size: '24px',
-        height: '8px',
-        color: 'yellow',
+    theme: {
+      triangles: {
+        'down': {
+          direction: 'down',
+          size: '24px',
+          height: '8px',
+          color: 'yellow',
+        },
       },
     },
   }).then(css => {
@@ -86,30 +116,32 @@ test('you can customize a triangle’s direction, size, height, and color', () =
 
 test('there are 8 possible directions', () => {
   return generatePluginCss({
-    triangles: {
-      'left': {
-        direction: 'left',
-      },
-      'right': {
-        direction: 'right',
-      },
-      'up': {
-        direction: 'up',
-      },
-      'down': {
-        direction: 'down',
-      },
-      'left-up': {
-        direction: 'left-up',
-      },
-      'left-down': {
-        direction: 'left-down',
-      },
-      'right-up': {
-        direction: 'right-up',
-      },
-      'right-down': {
-        direction: 'right-down',
+    theme: {
+      triangles: {
+        'left': {
+          direction: 'left',
+        },
+        'right': {
+          direction: 'right',
+        },
+        'up': {
+          direction: 'up',
+        },
+        'down': {
+          direction: 'down',
+        },
+        'left-up': {
+          direction: 'left-up',
+        },
+        'left-down': {
+          direction: 'left-down',
+        },
+        'right-up': {
+          direction: 'right-up',
+        },
+        'right-down': {
+          direction: 'right-down',
+        },
       },
     },
   }).then(css => {
@@ -172,9 +204,12 @@ test('there are 8 possible directions', () => {
 
 test('when the height of a triangle is not set, it defaults to half its size', () => {
   return generatePluginCss({
-    triangles: {
-      'default': {
-        size: '24px',
+    theme: {
+      triangles: {
+        'default': {
+          direction: 'right',
+          size: '24px',
+        },
       },
     },
   }).then(css => {
@@ -190,73 +225,33 @@ test('when the height of a triangle is not set, it defaults to half its size', (
   });
 });
 
-test('...unless we specified a default height', () => {
+test('the default size and color are customizable and overridable', () => {
   return generatePluginCss({
-    defaultOptions: {
-      height: '4rem',
-    },
-    triangles: {
-      'default': {
-        size: '24px',
+    theme: {
+      triangles: {
+        'default': {
+          direction: 'up',
+          height: '2em',
+        },
+        'special-left': {
+          direction: 'left',
+          size: '10vw',
+          height: '5vw',
+          color: 'blue',
+        },
       },
     },
+  }, {
+    defaultSize: '2em',
+    defaultColor: 'red',
   }).then(css => {
     expect(css).toMatchCss(`
       .c-triangle-default {
         width: 0;
         height: 0;
-        border-left: 4rem solid currentColor;
-        border-top: 12px solid transparent;
-        border-bottom: 12px solid transparent;
-      }
-    `);
-  });
-});
-
-test('the height has no effect when the direction is diagonal', () => {
-  return generatePluginCss({
-    triangles: {
-      'right-down': {
-        direction: 'right-down',
-        height: '99999px',
-      },
-    },
-  }).then(css => {
-    expect(css).toMatchCss(`
-      .c-triangle-right-down {
-        width: 0;
-        height: 0;
-        border-bottom: .7071067811865475em solid currentColor;
-        border-left: .7071067811865475em solid transparent;
-      }
-    `);
-  });
-});
-
-test('you can set default triangle options and override them', () => {
-  return generatePluginCss({
-    defaultOptions: {
-      direction: 'up',
-      size: '2rem',
-      color: 'red',
-    },
-    triangles: {
-      'default': {},
-      'special-left': {
-        direction: 'left',
-        size: '10vw',
-        height: '5vw',
-        color: 'blue',
-      },
-    },
-  }).then(css => {
-    expect(css).toMatchCss(`
-      .c-triangle-default {
-        width: 0;
-        height: 0;
-        border-bottom: 1rem solid red;
-        border-left: 1rem solid transparent;
-        border-right: 1rem solid transparent;
+        border-bottom: 2em solid red;
+        border-left: 1em solid transparent;
+        border-right: 1em solid transparent;
       }
       .c-triangle-special-left {
         width: 0;
