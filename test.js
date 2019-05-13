@@ -9,23 +9,14 @@ const generatePluginCss = (config, pluginOptions = {}) => {
   return postcss(
     tailwindcss(
       _.merge({
-        corePlugins: {
-          container: false,
-          ...(function() {
-            let disabledCorePlugins = {};
-            Object.keys(defaultConfig.variants).forEach(corePlugin => {
-              disabledCorePlugins[corePlugin] = false;
-            });
-            return disabledCorePlugins;
-          })(),
-        },
+        corePlugins: false,
         plugins: [
           trianglesPlugin(pluginOptions),
         ],
       }, config)
     )
   )
-  .process('@tailwind components;', {
+  .process('@tailwind components', {
     from: undefined,
   })
   .then(result => {
@@ -57,9 +48,9 @@ test('only a direction is required to generate a triangle component', () => {
       .c-triangle-right {
         width: 0;
         height: 0;
-        border-left: .5em solid currentColor;
-        border-top: .5em solid transparent;
-        border-bottom: .5em solid transparent;
+        border-left: 0.5em solid currentColor;
+        border-top: 0.5em solid transparent;
+        border-bottom: 0.5em solid transparent
       }
     `);
   });
@@ -81,9 +72,9 @@ test('the component prefix is customizable', () => {
       .triangle-right {
         width: 0;
         height: 0;
-        border-left: .5em solid currentColor;
-        border-top: .5em solid transparent;
-        border-bottom: .5em solid transparent;
+        border-left: 0.5em solid currentColor;
+        border-top: 0.5em solid transparent;
+        border-bottom: 0.5em solid transparent
       }
     `);
   });
@@ -108,7 +99,7 @@ test('directions, sizes, heights, and colors are customizable', () => {
         height: 0;
         border-top: 8px solid yellow;
         border-left: 12px solid transparent;
-        border-right: 12px solid transparent;
+        border-right: 12px solid transparent
       }
     `);
   });
@@ -149,54 +140,54 @@ test('there are 8 possible directions', () => {
       .c-triangle-left {
         width: 0;
         height: 0;
-        border-right: .5em solid currentColor;
-        border-top: .5em solid transparent;
-        border-bottom: .5em solid transparent;
+        border-right: 0.5em solid currentColor;
+        border-top: 0.5em solid transparent;
+        border-bottom: 0.5em solid transparent
       }
       .c-triangle-right {
         width: 0;
         height: 0;
-        border-left: .5em solid currentColor;
-        border-top: .5em solid transparent;
-        border-bottom: .5em solid transparent;
+        border-left: 0.5em solid currentColor;
+        border-top: 0.5em solid transparent;
+        border-bottom: 0.5em solid transparent
       }
       .c-triangle-up {
         width: 0;
         height: 0;
-        border-bottom: .5em solid currentColor;
-        border-left: .5em solid transparent;
-        border-right: .5em solid transparent;
+        border-bottom: 0.5em solid currentColor;
+        border-left: 0.5em solid transparent;
+        border-right: 0.5em solid transparent
       }
       .c-triangle-down {
         width: 0;
         height: 0;
-        border-top: .5em solid currentColor;
-        border-left: .5em solid transparent;
-        border-right: .5em solid transparent;
+        border-top: 0.5em solid currentColor;
+        border-left: 0.5em solid transparent;
+        border-right: 0.5em solid transparent
       }
       .c-triangle-left-up {
         width: 0;
         height: 0;
-        border-top: .7071067811865475em solid currentColor;
-        border-right: .7071067811865475em solid transparent;
+        border-top: 0.7071067811865475em solid currentColor;
+        border-right: 0.7071067811865475em solid transparent
       }
       .c-triangle-left-down {
         width: 0;
         height: 0;
-        border-bottom: .7071067811865475em solid currentColor;
-        border-right: .7071067811865475em solid transparent;
+        border-bottom: 0.7071067811865475em solid currentColor;
+        border-right: 0.7071067811865475em solid transparent
       }
       .c-triangle-right-up {
         width: 0;
         height: 0;
-        border-top: .7071067811865475em solid currentColor;
-        border-left: .7071067811865475em solid transparent;
+        border-top: 0.7071067811865475em solid currentColor;
+        border-left: 0.7071067811865475em solid transparent
       }
       .c-triangle-right-down {
         width: 0;
         height: 0;
-        border-bottom: .7071067811865475em solid currentColor;
-        border-left: .7071067811865475em solid transparent;
+        border-bottom: 0.7071067811865475em solid currentColor;
+        border-left: 0.7071067811865475em solid transparent
       }
     `);
   });
@@ -219,7 +210,7 @@ test('when the height of a triangle is not set, it defaults to half its size', (
         height: 0;
         border-left: 12px solid currentColor;
         border-top: 12px solid transparent;
-        border-bottom: 12px solid transparent;
+        border-bottom: 12px solid transparent
       }
     `);
   });
@@ -251,14 +242,14 @@ test('the default size and color are customizable and overridable', () => {
         height: 0;
         border-bottom: 2em solid red;
         border-left: 1em solid transparent;
-        border-right: 1em solid transparent;
+        border-right: 1em solid transparent
       }
       .c-triangle-special-left {
         width: 0;
         height: 0;
         border-right: 5vw solid blue;
         border-top: 5vw solid transparent;
-        border-bottom: 5vw solid transparent;
+        border-bottom: 5vw solid transparent
       }
     `);
   });
