@@ -2,15 +2,15 @@ const _ = require('lodash');
 const valueParser = require('postcss-value-parser');
 
 module.exports = function(options = {}) {
-  return ({ config, e, addComponents }) => {
+  return ({ theme, e, addComponents }) => {
     const defaultOptions = {
       componentPrefix: 'c-',
       defaultSize: '1em',
       defaultColor: 'currentColor',
     };
-    options = _.merge({}, defaultOptions, options);
+    options = _.defaults({}, options, defaultOptions);
 
-    const triangles = config('theme.triangles', {});
+    const triangles = theme('triangles', {});
 
     _.forEach(triangles, function(value, modifier) {
       const triangle = _.defaults({}, value, {
