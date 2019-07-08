@@ -21,6 +21,9 @@ npm install tailwindcss-triangles
       },
     },
   },
+  variants: {
+    triangles: ['responsive'], // defaults to []
+  },
   plugins: [
     require('tailwindcss-triangles')({
       componentPrefix: 'c-',        // defaults to 'c-'
@@ -37,8 +40,20 @@ The above configuration would generate the following CSS:
 .c-triangle-left {
   width: 0;
   height: 0;
+  border: 0;
   border-right: .5em solid currentColor;
   border-top: .5em solid transparent;
   border-bottom: .5em solid transparent;
+}
+
+@media (min-width: 640px) {
+  .sm\\:c-triangle-left {
+    width: 0;
+    height: 0;
+    border: 0;
+    border-right: .5em solid currentColor;
+    border-top: .5em solid transparent;
+    border-bottom: .5em solid transparent;
+  }
 }
 ```
