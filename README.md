@@ -10,7 +10,7 @@ npm install tailwindcss-triangles
 
 ```js
 // tailwind.config.js
-{
+module.exports = {
   theme: {
     triangles: {
       'left': {
@@ -31,7 +31,7 @@ npm install tailwindcss-triangles
       defaultColor: 'currentColor', // defaults to 'currentColor'
     }),
   ],
-}
+};
 ```
 
 The above configuration would generate the following CSS:

@@ -1,23 +1,21 @@
+const plugin = require('tailwindcss/plugin');
 const _ = require('lodash');
 const valueParser = require('postcss-value-parser');
 
-module.exports = function(options = {}) {
-  return ({ theme, variants, e, addComponents }) => {
-    const defaultOptions = {
-      componentPrefix: 'c-',
-      defaultSize: '1em',
-      defaultColor: 'currentColor',
-    };
+const defaultOptions = {
+  componentPrefix: 'c-',
+  defaultSize: '1em',
+  defaultColor: 'currentColor',
+};
+
+module.exports = plugin.withOptions(function(options = {}) {
+  return function({ theme, variants, e, addComponents }) {
     options = _.defaults({}, options, defaultOptions);
 
-    const defaultTrianglesTheme = {};
-    const defaultTrianglesVariants = [];
-
-    const trianglesTheme = theme('triangles', defaultTrianglesTheme);
-    const trianglesVariants = variants('triangles', defaultTrianglesVariants);
+    const trianglesVariants = variants('triangles');
 
     const trianglesComponents = _.fromPairs(
-      _.map(trianglesTheme, function(value, modifier) {
+      _.map(theme('triangles'), function(value, modifier) {
         const triangle = _.defaults({}, value, {
           size: options.defaultSize,
           color: options.defaultColor,
@@ -95,4 +93,13 @@ module.exports = function(options = {}) {
       addComponents(trianglesComponents);
     }
   };
-};
+}, function() {
+  return {
+    theme: {
+      triangles: {},
+    },
+    variants: {
+      triangles: [],
+    },
+  };
+});
