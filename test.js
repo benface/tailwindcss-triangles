@@ -61,7 +61,7 @@ test('only a direction is required to generate a triangle component', () => {
   });
 });
 
-test('the component prefix is customizable', () => {
+test('the component prefix can be customized', () => {
   return generatePluginCss({
     theme: {
       triangles: {
@@ -86,7 +86,7 @@ test('the component prefix is customizable', () => {
   });
 });
 
-test('directions, sizes, heights, and colors are customizable', () => {
+test('directions, sizes, heights, and colors can be customized', () => {
   return generatePluginCss({
     theme: {
       triangles: {
