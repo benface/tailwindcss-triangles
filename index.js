@@ -84,14 +84,7 @@ module.exports = plugin.withOptions(function(options = {}) {
       })
     );
 
-    if (trianglesVariants.length > 0) {
-      addComponents({
-        [`@variants ${trianglesVariants.join(', ')}`]: trianglesComponents,
-      });
-    }
-    else {
-      addComponents(trianglesComponents);
-    }
+    addComponents(trianglesComponents, trianglesVariants);
   };
 }, function() {
   return {

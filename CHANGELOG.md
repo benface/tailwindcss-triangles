@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project mostly adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0] - 2020-08-04
+
+### Changed
+- Got rid of the internal hack we used in order to support variants, thanks to Tailwind’s `addComponents()` accepting a `variants` option since v1.5
+
 ## [3.0.0] - 2020-02-05
 
 ### Changed
@@ -35,7 +40,8 @@ No change since 2.0.0-beta.1
 
 Initial release
 
-[Unreleased]: https://github.com/benface/tailwindcss-triangles/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/benface/tailwindcss-triangles/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/benface/tailwindcss-triangles/compare/v3.0.0...v4.0.0
 [3.0.0]: https://github.com/benface/tailwindcss-triangles/compare/v2.1.0...v3.0.0
 [2.1.0]: https://github.com/benface/tailwindcss-triangles/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/benface/tailwindcss-triangles/compare/v2.0.0-beta.1...v2.0.0
